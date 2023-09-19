@@ -37,6 +37,8 @@ public enum KeyboardShortcuts {
 	private static var openMenuObserver: NSObjectProtocol?
 	private static var closeMenuObserver: NSObjectProtocol?
 
+	public static var defaults: UserDefaults = UserDefaults.standard
+
 	/**
 	When `true`, event handlers will not be called for registered keyboard shortcuts.
 	*/
@@ -293,7 +295,7 @@ public enum KeyboardShortcuts {
 	*/
 	public static func getShortcut(for name: Name) -> Shortcut? {
 		guard
-			let data = UserDefaults.standard.string(forKey: userDefaultsKey(for: name))?.data(using: .utf8),
+			let data = defaults.string(forKey: userDefaultsKey(for: name))?.data(using: .utf8),
 			let decoded = try? JSONDecoder().decode(Shortcut.self, from: data)
 		else {
 			return nil
@@ -426,7 +428,7 @@ public enum KeyboardShortcuts {
 		}
 
 		register(shortcut)
-		UserDefaults.standard.set(encoded, forKey: userDefaultsKey(for: name))
+		defaults.set(encoded, forKey: userDefaultsKey(for: name))
 		userDefaultsDidChange(name: name)
 	}
 
@@ -435,7 +437,7 @@ public enum KeyboardShortcuts {
 			return
 		}
 
-		UserDefaults.standard.set(false, forKey: userDefaultsKey(for: name))
+		defaults.set(false, forKey: userDefaultsKey(for: name))
 		unregister(shortcut)
 		userDefaultsDidChange(name: name)
 	}
@@ -445,13 +447,13 @@ public enum KeyboardShortcuts {
 			return
 		}
 
-		UserDefaults.standard.removeObject(forKey: userDefaultsKey(for: name))
+		defaults.removeObject(forKey: userDefaultsKey(for: name))
 		unregister(shortcut)
 		userDefaultsDidChange(name: name)
 	}
 
 	static func userDefaultsContains(name: Name) -> Bool {
-		UserDefaults.standard.object(forKey: userDefaultsKey(for: name)) != nil
+		defaults.object(forKey: userDefaultsKey(for: name)) != nil
 	}
 }
 
